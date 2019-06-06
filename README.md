@@ -5,8 +5,10 @@ Main two parts of this project are:
 * Python GUI application handling communication with the board, visualizing received data, and writing them to hdf5 file.
 
 
-##Requirements:
+## Requirements:
+
 (tested with)
+
 	system: Ubuntu 18.04
 	tools: 	Xilinx Vivado WebPack (2018.3 or newer)
 		Opal Kelly FrontPanel (Python3 API & HDL sources)

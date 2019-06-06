@@ -4,9 +4,14 @@ This is a simplified Python version of PipeTest.cpp application from Opal Kelly 
 
 an Opal Kelly FPGA board device and a corresponding PipeTest.bit file are needed
 """
-
+import os
 import sys
 import time
+
+# add parent directory to PYTHONPATH
+file_dir = os.path.dirname(os.path.realpath(__file__))
+parent_dir = os.path.dirname(file_dir)
+sys.path.append(parent_dir)
 
 from FrontPanelAPI import ok
 
@@ -215,18 +220,18 @@ def Transfer(dev: ok.okCFrontPanel, transfer_settings: TransferSettings, read_wr
     else:
         # if the loop ended normally (no breaks => no errors)
         duration = time.time() - start_time
-        transfer_speed_MBs = transfer_settings.segment_size*transfer_settings.count / (1024*1024*duration)
-        reportBandwidthResults(read_write, transfer_settings, duration, transfer_speed_MBs)
+        transfer_speed_MiBs = transfer_settings.segment_size*transfer_settings.count / (1024*1024*duration)
+        reportBandwidthResults(read_write, transfer_settings, duration, transfer_speed_MiBs)
 
 
-def reportBandwidthResults(read_write, transfer_settings, duration, transfer_speed_MBs):
-    print("{:5} Block Size: {:8.2f}B \tSS:{:10.2f}kB \tTS:{:8.2f}kB \tDuration: {:.3f}sec -- {:6.2f} MB/s ".format(
+def reportBandwidthResults(read_write, transfer_settings, duration, transfer_speed_MiBs):
+    print("{:5} Block Size: {:8.2f}B \tSS:{:10.2f}kB \tTS:{:8.2f}kB \tDuration: {:.3f}sec -- {:6.2f} MiB/s ".format(
                                                                  read_write,
                                                                 transfer_settings.block_size,
                                                                 transfer_settings.segment_size/1024,
                                                                  transfer_settings.segment_size * transfer_settings.count/1024,
                                                                  duration,
-                                                                 transfer_speed_MBs))
+                                                                 transfer_speed_MiBs))
 
 def reportUnsupported(read_write, transfer_settings, error_info):
     print("{:5} Block Size: {:8.2f}B \tSS:{:10.2f}kB \tTS:{:8.2f}kB \t{}".format(read_write,
