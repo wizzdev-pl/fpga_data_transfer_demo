@@ -1,0 +1,4 @@
+h5py
+numpy
+PySide2
+#pyqtgraph <- must be installed from sources
