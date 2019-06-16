@@ -80,7 +80,9 @@ class MainWindow(QMainWindow):
             logger.error("Error! Wrong hdf5 file path")
             return
         self._file_reader = HDF5FileReader(file_to_open_path)
-        self._file_reader.load_plot_data()
+        if not self._file_reader.load_plot_data():
+            logger.info("Selected file is empty")
+            return
         self._menu_widget.hide()
         self._setup_plot_widget(offline=True)
         self._plot_widget.plot_data()

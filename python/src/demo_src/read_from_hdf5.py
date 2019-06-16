@@ -25,7 +25,11 @@ class HDF5FileReader:
         self.plot_data = PlotData(self.number_of_sources, self.sampling_rate)
 
     def load_plot_data(self):
-        self.plot_data.append_data(self.data_set[:])
+        if self.time_span == 0:
+            return False
+        else:
+            self.plot_data.append_data(self.data_set[:])
+            return True
 
     def get_data(self, channel, time_span):
         if type(channel) == list:

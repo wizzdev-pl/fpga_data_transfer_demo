@@ -29,7 +29,7 @@ class FileWriter:
 
     def _run(self):
         while True:
-            should_stop =  self.should_stop and self.queue.empty()
+            should_stop = self.should_stop and self.queue.empty()
             if should_stop:
                 break
             if self.queue.empty():
@@ -57,7 +57,7 @@ class FileWriter:
         # list and append
         self._buffers_list_to_write.append(buffer)
         self._buffers_counter += 1
-        if self._buffers_counter % self.BUFFERS_TO_WRITE == 0:
+        if (self._buffers_counter % self.BUFFERS_TO_WRITE == 0) or (self.should_stop and self.queue.empty()):
             self.hdf5_wirter.append_data(np.concatenate(self._buffers_list_to_write))
             self._buffers_list_to_write = []
 

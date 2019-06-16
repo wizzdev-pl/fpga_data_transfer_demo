@@ -20,7 +20,7 @@ class DataManager:
 
     def _run(self):
         while True:
-            should_stop =  self.should_stop and self.queue.empty()
+            should_stop = self.should_stop and self.queue.empty()
             if should_stop:
                 break
             if self.queue.empty():

@@ -5,13 +5,13 @@ import time
 import PySide2
 from PySide2.QtCore import QObject, Signal
 
-from demo_src.fpga_demo import FPGA_demo
+from demo_src.fpga_device import FPGADevice
 from demo_src.data_unpacker import DataUnpacker
 from demo_src.file_writer import FileWriter
 from demo_src.data_manager import DataManager
 from demo_src.plot_data_source import PlotDataSource, PlotData
 
-BLOCK_LENGTH = 16*1024
+BLOCK_LENGTH = 1024
 TRANSFER_LENGTH = BLOCK_LENGTH  #
 
 MIN_TIME_SPAN = 1024
@@ -50,7 +50,7 @@ class DemoTasksRunner(QObject):
         self.thread.start()
 
     def _start_services(self):
-        self.device = FPGA_demo()
+        self.device = FPGADevice()
         self.device.load_bit_file(self.bit_file_path)
 
         self.data_unpacker = DataUnpacker(packet_length_in_bytes=self.package_length_in_bytes, number_of_channels=self.number_of_channels)

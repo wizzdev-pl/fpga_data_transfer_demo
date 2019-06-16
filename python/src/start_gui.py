@@ -3,6 +3,9 @@ import os
 import sys
 import logging
 
+current_script_dir = os.path.dirname(os.path.realpath(__file__))
+sys.path.append(os.path.join(current_script_dir, '../'))
+
 from demo_src.status_logger import StatusBarLogHandler
 
 from gui.main_window import MainWindow

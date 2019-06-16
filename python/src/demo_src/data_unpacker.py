@@ -72,7 +72,7 @@ class DataUnpacker:
         packet_id = struct.unpack('<2H', packet[:4])
         packet_id = (packet_id[0]<<16) + packet_id[1]
 
-        if (packet_id != self.last_id+1) and (packet_id !=0):
+        if (packet_id != self.last_id+1) and (packet_id != 0):
             self.with_incorrect_id += 1
             wrong_id = True
         else:

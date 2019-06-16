@@ -8,12 +8,11 @@ import logging
 from FrontPanelAPI import ok
 from .common import ok_error_message
 
-#f_rate = 0  # 0-3
-#sig_type = 0  # 0-3
+
 logger = logging.getLogger("Status bar logger")
 
 
-class FPGA_demo:
+class FPGADevice:
 
     FILL_LEVEL_WIRE_OUT_ADDRESS = 0x21
     DATA_GENERATION_TRIGGER_IN_ADDRESS = 0x40
@@ -72,7 +71,6 @@ class FPGA_demo:
         self.check_errors(error_code)
         error_code = self.xem.UpdateWireIns()
         self.check_errors(error_code)
-
 
     def receive_data(self, block_length, buffer_length):
 
