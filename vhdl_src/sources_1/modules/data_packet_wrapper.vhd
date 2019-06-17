@@ -15,9 +15,9 @@ use IEEE.NUMERIC_STD.ALL;
 
 
 entity data_packet_wrapper is
-    Generic (PACKET_LENGTH : positive := 512;
-             PACKET_ID_LENGTH : positive := 32;
-             CRC_LENGTH : positive := 32);
+    Generic (PACKET_LENGTH : positive;
+             PACKET_ID_LENGTH : positive;
+             CRC_LENGTH : positive);
     Port (  
             clk_in :    in STD_LOGIC;
             reset :     in STD_LOGIC; 

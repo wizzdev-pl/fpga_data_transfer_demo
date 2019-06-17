@@ -23,9 +23,9 @@ use UNISIM.VComponents.all;
 use work.FRONTPANEL.all;
 
 
-entity new_demo_top is
+entity demo_top is
     Generic (NUMBER_OF_SRCS : positive := 4;
-            SAMPLING_FREQUENCY : positive := 1e3;
+            SAMPLING_FREQUENCY : positive := 1e4;
             PACKET_LENGTH : positive := 4096;
             PACKET_ID_LENGTH : positive := 32;
             CRC_LENGTH : positive := 32);
@@ -59,9 +59,9 @@ entity new_demo_top is
           
            -- onboard LEDs       
            debug_LEDs : out STD_LOGIC_VECTOR(7 downto 0) := (others => 'Z'));
-end new_demo_top;
+end demo_top;
 
-architecture Behavioral of new_demo_top is
+architecture Behavioral of demo_top is
 
 constant USABLE_PACKET_LENGTH : natural := PACKET_LENGTH - (PACKET_ID_LENGTH + CRC_LENGTH);
 constant USB_BUFFER_LENGTH : natural := 8*1024; -- in Bytes, the BLOCK_LENGTH for BlockThrottledPipe transfers
@@ -412,7 +412,8 @@ epA0 : okBTPipeOut
               ep_read           =>  pipe_out_read, 
               ep_datain         =>  pipe_out_data,
               ep_blockstrobe    =>  block_strobe,
-              ep_ready          =>  pipe_ready);
+              ep_ready          =>  pipe_ready
+              );
 
 
 end Behavioral;

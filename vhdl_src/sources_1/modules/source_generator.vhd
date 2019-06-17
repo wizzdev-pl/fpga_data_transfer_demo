@@ -24,8 +24,8 @@ use UNISIM.VComponents.all;
 
 entity source_generator is
     Generic (INPUT_CLK_F : natural := 100e6; -- 100MHz
-             TARGET_SAMPLING_FREQ : positive := 1e6;
-             NUMBER_OF_SOURCES : positive := 28);
+             TARGET_SAMPLING_FREQ : positive;
+             NUMBER_OF_SOURCES : positive);
     Port ( clk : in STD_LOGIC;
            ce : STD_LOGIC;
            reset : in STD_LOGIC;

@@ -20,9 +20,9 @@ library UNISIM;
 use UNISIM.VComponents.all;
 
 entity ddr3_fifo_controller is
-  Generic (PACKET_LENGTH : positive := 256;
-           PACKET_ID_LENGTH : positive := 16;
-           CRC_LENGTH : positive := 16);
+  Generic (PACKET_LENGTH : positive;
+           PACKET_ID_LENGTH : positive;
+           CRC_LENGTH : positive);
   Port (
       ui_clk                        : in    std_logic;
       rst                           : in    std_logic; 
