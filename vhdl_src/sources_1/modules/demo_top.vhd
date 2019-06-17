@@ -23,8 +23,9 @@ use UNISIM.VComponents.all;
 use work.FRONTPANEL.all;
 
 
-entity demo_top is
-    Generic (NUMBER_OF_SRCS : positive := 2;
+entity new_demo_top is
+    Generic (NUMBER_OF_SRCS : positive := 4;
+            SAMPLING_FREQUENCY : positive := 1e3;
             PACKET_LENGTH : positive := 4096;
             PACKET_ID_LENGTH : positive := 32;
             CRC_LENGTH : positive := 32);
@@ -58,12 +59,12 @@ entity demo_top is
           
            -- onboard LEDs       
            debug_LEDs : out STD_LOGIC_VECTOR(7 downto 0) := (others => 'Z'));
-end demo_top;
+end new_demo_top;
 
-architecture Behavioral of demo_top is
+architecture Behavioral of new_demo_top is
 
-constant USABLE_PACKET_LENGTH : natural := PACKET_LENGTH - PACKET_ID_LENGTH - CRC_LENGTH;
-constant USB_BUFFER_LENGTH : natural := 16*1024; -- in Bytes, the BLOCK_LENGTH for BlockThrottledPipe transfers
+constant USABLE_PACKET_LENGTH : natural := PACKET_LENGTH - (PACKET_ID_LENGTH + CRC_LENGTH);
+constant USB_BUFFER_LENGTH : natural := 8*1024; -- in Bytes, the BLOCK_LENGTH for BlockThrottledPipe transfers
 
 signal ui_clk : STD_LOGIC;      -- 100Mhz generated from MIG
 signal clk_200MHz : STD_LOGIC;
@@ -166,7 +167,7 @@ begin
 -- Asserts to check the settings
 -- Does usable packet length is a multiply of 16bits ()
 assert (USABLE_PACKET_LENGTH mod 16 = 0) report "Incorrect packet length!" severity error;
-assert ((USABLE_PACKET_LENGTH/16) mod NUMBER_OF_SRCS = 0) report "Incorrect packet length for given number of sources!" severity error;
+assert (((USABLE_PACKET_LENGTH/16) mod NUMBER_OF_SRCS) = 0) report "Incorrect packet length for given number of sources!" severity error;
 
 debug_info2(0) <= '1' when packets_fifo_ready = '1' else 'Z';
 debug_info2(1) <= '1' when packets_fifo_re = '1' else 'Z';
@@ -225,7 +226,8 @@ pipe_ready <= '1' when (fifo_out_read_data_count >= std_logic_vector(to_unsigned
 
 
 source_gen0 : entity work.source_generator
-    GENERIC MAP (NUMBER_OF_SOURCES => NUMBER_OF_SRCS)
+    GENERIC MAP (TARGET_SAMPLING_FREQ => SAMPLING_FREQUENCY,
+                NUMBER_OF_SOURCES => NUMBER_OF_SRCS)
     PORT MAP(
     clk => ui_clk,
     ce => src_gen_enable,

@@ -57,15 +57,15 @@ signal fifo_empty : STD_LOGIC;
 
 begin
 
-assert TARGET_SAMPLING_FREQ < (NUMBER_OF_SOURCES * INPUT_CLK_F) report "Target sampling frequency too high for a given number of sources!" severity error;
+assert INPUT_CLK_F > (NUMBER_OF_SOURCES * TARGET_SAMPLING_FREQ) report "Target sampling frequency too high for a given number of sources!" severity error;
 
     GEN_SRCS:
     for I in 0 to NUMBER_OF_SOURCES-1 generate
     
         SRC_0: if (I mod 2) = 0 generate
             sine: entity work.sine_gen
-            generic map(CLK_FREQ_HZ => INPUT_CLK_F,
-                        SINE_FREQ => 1e3)
+            generic map(SAMPLING_FREQ => TARGET_SAMPLING_FREQ,
+                        SINE_FREQ => (I+1)*10)
             port map(clk => sampling_clk,
                     ce => ce,
                     rst => reset,
@@ -75,9 +75,9 @@ assert TARGET_SAMPLING_FREQ < (NUMBER_OF_SOURCES * INPUT_CLK_F) report "Target s
         
         SRC_1: if (I mod 2) = 1 generate
             saw: entity work.saw_gen
-            generic map(INPUT_CLK_F => INPUT_CLK_F,
+            generic map(INPUT_CLK_F => TARGET_SAMPLING_FREQ,
                         TARGET_F => INPUT_CLK_F,
-                        SLOPE_COUNTER_MAX => 1024)
+                        SLOPE_COUNTER_MAX => (I+1)*1024)
             port map(clk => sampling_clk,
                     ce => ce,
                     rst => reset,

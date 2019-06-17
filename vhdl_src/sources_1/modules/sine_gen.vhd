@@ -3,7 +3,7 @@
 -- Engineer: Z.Czarnota
 --  
 -- Project Name: FGPA_data_transfer_demo
--- Module Name: Sine signal generator using lookup table
+-- Module Name: Sine signal generator using lookup table and phase accumulaor
 -- 
 -- Revision: 06.2019
 ----------------------------------------------------------------------------------
@@ -19,7 +19,7 @@ library UNISIM;
 use UNISIM.VComponents.all;
 
 entity sine_gen is
-    Generic (CLK_FREQ_HZ : positive := 100e6;
+    Generic (SAMPLING_FREQ : positive := 100e6;
              SINE_FREQ : positive := 1e3  
              );
     Port ( clk : in STD_LOGIC;
@@ -32,46 +32,10 @@ end sine_gen;
 
 architecture Behavioral of sine_gen is
 
-    function div_floor (constant dividend, divisor : in integer) return integer is
-     variable i : integer;
-     variable diff_tmp : integer;
-    begin
-         i := 0;
-         diff_tmp := dividend - divisor;
-         for j in 0 to (2**31) loop
-              if (diff_tmp > 0) then
-                   diff_tmp := diff_tmp - divisor;
-                   i := i + 1;
-              else
-                   exit;
-              end if;
-         end loop;
-         return i;
-    end function;
-    
-    function SELECT_INCREMENT (constant f_target, f_base : in integer) return integer is
-    begin
-        if f_target > f_base then
-            return div_floor(f_target, f_base);
-        else
-            return 1;
-        end if;
-    end function;
-    
-    function SELECT_SKIPPER (constant f_target, f_base : in integer) return integer is
-    begin
-        if f_target < f_base then
-            return div_floor(f_base, f_target);
-        else
-            return 0;
-        end if;
-    end function;
-
-
     constant NUMBER_OF_SAMPLES : positive := 2**8;
-    constant BASE_FREQ : positive := positive(ceil(real(CLK_FREQ_HZ) /real(NUMBER_OF_SAMPLES)));
-    constant INDEX_INCREMENT : positive := SELECT_INCREMENT(SINE_FREQ, BASE_FREQ);
-    constant INDEX_SKIPPER : natural := SELECT_SKIPPER(SINE_FREQ, BASE_FREQ);
+    constant ACCU_WIDTH : positive := 30;
+    constant FREQ_RATIO : positive := SAMPLING_FREQ / SINE_FREQ;
+    constant PHASE_INCREMENT : positive := (2**ACCU_WIDTH) / FREQ_RATIO;
     
     type t_sin_table is array(0 to NUMBER_OF_SAMPLES-1) of integer range 0 to 2**16-1;
     
@@ -93,11 +57,13 @@ architecture Behavioral of sine_gen is
         9597,	10173,	10762,	11364,	11980,	12608,	13248,	13899,	14563,	15237,	15921,	16616,	17321,	18035,	18757,	19489,
         20228,	20974,	21728,	22489,	23255,	24028,	24806,	25588,	26375,	27165,	27959,	28756,	29556,	30357,	31160,	31963
         );
+        
+signal phase_accumulator : unsigned(ACCU_WIDTH-1 downto 0) := (others => '0');
     
 begin
 
 process(clk)
-variable current_index : natural := 0;
+variable current_phase : unsigned(7 downto 0);
 variable temp_output_valid : STD_LOGIC := '0';
 
 variable temp_index : natural;
@@ -110,22 +76,15 @@ begin
         temp_output_valid := '0';       -- set to zero after every full clock cicle
     
         if (rst = '1') then
-            current_index := 0;
+            phase_accumulator <= (others => '0');
             
         elsif (ce = '1') then
             
-            temp_sin := SIN_LOOKUP_TABLE(current_index);
+            current_phase := phase_accumulator(ACCU_WIDTH-1 downto ACCU_WIDTH-8);
+            temp_sin := SIN_LOOKUP_TABLE(to_integer(current_phase));
             data_out <= std_logic_vector(to_unsigned(temp_sin, 16));
             
-            if INDEX_SKIPPER > 0 then
-                temp_index_counter := temp_index_counter + 1;
-                if temp_index_counter > INDEX_SKIPPER then
-                    current_index := current_index + 1;
-                    temp_index_counter := 0;
-                end if;
-            else
-                current_index := current_index + INDEX_INCREMENT;
-            end if;
+            phase_accumulator <= phase_accumulator + PHASE_INCREMENT;
                             
             temp_output_valid := '1';
         end if;
