@@ -26,9 +26,7 @@ use work.FRONTPANEL.all;
 entity demo_top is
     Generic (NUMBER_OF_SRCS : positive := 4;
             SAMPLING_FREQUENCY : positive := 1e4;
-            PACKET_LENGTH : positive := 4096;
-            PACKET_ID_LENGTH : positive := 32;
-            CRC_LENGTH : positive := 32);
+            PACKET_LENGTH_BYTES : positive := 512);
     Port ( 
            -- USB3.0 interface
            okUH     : in STD_LOGIC_VECTOR(4 downto 0);
@@ -42,8 +40,8 @@ entity demo_top is
            
            -- DDR3 interface
            ddr3_dq      : inout STD_LOGIC_VECTOR(31 downto 0);
-           ddr3_dqs_p   : inout std_logic_vector(3 downto 0);
-           ddr3_dqs_n   : inout std_logic_vector(3 downto 0);
+           ddr3_dqs_p   : inout STD_LOGIC_VECTOR(3 downto 0);
+           ddr3_dqs_n   : inout STD_LOGIC_VECTOR(3 downto 0);
            
            ddr3_addr    : out STD_LOGIC_VECTOR(14 downto 0);
            ddr3_ba      : out STD_LOGIC_VECTOR(2 downto 0);
@@ -52,16 +50,20 @@ entity demo_top is
            ddr3_cke     : out STD_LOGIC_VECTOR(0 downto 0);
            ddr3_dm      : out   STD_LOGIC_VECTOR(3 downto 0);
            ddr3_odt     : out   STD_LOGIC_VECTOR(0 downto 0);
-           ddr3_ras_n   : out   std_logic;
-           ddr3_cas_n   : out   std_logic;
-           ddr3_we_n    : out   std_logic;
-           ddr3_reset_n : out   std_logic;
+           ddr3_ras_n   : out   STD_LOGIC;
+           ddr3_cas_n   : out   STD_LOGIC;
+           ddr3_we_n    : out   STD_LOGIC;
+           ddr3_reset_n : out   STD_LOGIC;
           
            -- onboard LEDs       
            debug_LEDs : out STD_LOGIC_VECTOR(7 downto 0) := (others => 'Z'));
 end demo_top;
 
 architecture Behavioral of demo_top is
+
+constant PACKET_ID_LENGTH : positive := 32;
+constant CRC_LENGTH : positive := 32;
+constant PACKET_LENGTH :positive := PACKET_LENGTH_BYTES * 8;
 
 constant USABLE_PACKET_LENGTH : natural := PACKET_LENGTH - (PACKET_ID_LENGTH + CRC_LENGTH);
 constant USB_BUFFER_LENGTH : natural := 8*1024; -- in Bytes, the BLOCK_LENGTH for BlockThrottledPipe transfers
@@ -100,18 +102,18 @@ signal mode : STD_LOGIC_VECTOR(3 downto 0);
 signal source_data_valid : STD_LOGIC;
 
 -- ddr3 interface
-signal  app_addr          : std_logic_vector(28 downto 0);  -- DDR3 r/w address
-signal  app_cmd           : std_logic_vector(2 downto 0);   -- 000: write 0001: read
-signal  app_en            : std_logic := '0';                      
-signal  app_wdf_end       : std_logic;
-signal  app_wdf_mask      : std_logic_vector(31 downto 0) := (others => '0');
-signal  app_wdf_wren      : std_logic;
-signal  app_wdf_data       : STD_LOGIC_VECTOR(255 downto 0);
-signal  app_rd_data       : std_logic_vector(255 downto 0);
-signal  app_rd_data_end   : std_logic;
-signal  app_rd_data_valid : std_logic;
-signal  app_rdy           :  std_logic;
-signal  app_wdf_rdy       :  std_logic;
+signal  app_addr          : STD_LOGIC_VECTOR(28 downto 0);  -- DDR3 r/w address
+signal  app_cmd           : STD_LOGIC_VECTOR(2 downto 0);   -- 000: write 0001: read
+signal  app_en            : STD_LOGIC := '0';                      
+signal  app_wdf_end       : STD_LOGIC;
+signal  app_wdf_mask      : STD_LOGIC_VECTOR(31 downto 0) := (others => '0');
+signal  app_wdf_wren      : STD_LOGIC;
+signal  app_wdf_data      : STD_LOGIC_VECTOR(255 downto 0);
+signal  app_rd_data       : STD_LOGIC_VECTOR(255 downto 0);
+signal  app_rd_data_end   : STD_LOGIC;
+signal  app_rd_data_valid : STD_LOGIC;
+signal  app_rdy           :  STD_LOGIC;
+signal  app_wdf_rdy       :  STD_LOGIC;
 
 signal ddr3_calib_done : STD_LOGIC;
 signal ddr3_empty      : STD_LOGIC;
