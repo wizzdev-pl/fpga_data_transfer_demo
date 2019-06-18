@@ -2,7 +2,7 @@
 # FPGA Data Transfer demo
 is a simple & exemplary project designed for high speed data acquisition.
 
-Main two parts of this project are:
+Two main parts of this project are:
 * FPGA program (written in VHDL) responsible for data generation and transmission,
 * Python GUI application handling communication with the board, visualizing received data, and writing them to hdf5 file.
 
@@ -26,7 +26,7 @@ Opal Kelly **FrontPanel HDL** files for a correct board must be added to your Vi
 
 ## Generating bitstream for FPGA
 Project in Vivado must be set up, and all files from `fpga_data_transfer_demo/vhdl_src` folder (and its subfolders) added to it. 
-If you are not familiar with Vivado,  you can look into our [blog post](https://wizzdev.pl/blog/fpga-data-transfer-demo-2/) in which the whole process is described step by step.
+If you are not familiar with Vivado,  you can take a look into our [blog post](https://wizzdev.pl/blog/fpga-data-transfer-demo-2/) in which the whole process is described step by step.
 
 Generated bitstream  is then needed by the GUI application, which will use it to program the FPGA. Remember the values of :  
 - number of sources, 
@@ -65,3 +65,4 @@ assuming you are currently in `fpga_data_transfer_demo/python/src` directory, el
 ## ...
 More info about the project can be found on our website:
 https://wizzdev.pl/blog/category/fpga-projects/
+
